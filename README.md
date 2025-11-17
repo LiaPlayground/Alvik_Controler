@@ -1,7 +1,7 @@
 <!--
 author:   Ihr Name
 email:    ihre.email@beispiel.de
-version:  1.0.0
+version:  1.0.1
 language: de
 narrator: Deutsch Female
 
@@ -111,7 +111,11 @@ Unsere Aufgabe integriert alle Komponenten eines klassischen **Regelkreises**:
                                    └──────────────┘                                                 .
 ```
 
+                  {{0-1}}        
 > **Aufgabe:** Nehmen wir an, wir wollen einen Regelkreis aufbauen, so dass ein autonomes Automobile immer in der Mitte der Straße bleibt. Wie würden wir das umsetzen? 
+
+                  {{1-2}}
+*********************************************
 
 > Was brauchen wir für unser "Der Roboter folgt der Hand"-Projekt?
 >
@@ -124,7 +128,12 @@ Unsere Aufgabe integriert alle Komponenten eines klassischen **Regelkreises**:
 >
 > Danach testen wir unsere Regelung und optimieren die Parameter mit der Strecke - also unserem Roboter auf dem Tisch. 
 
+*********************************************
+
 ## 1. Messglied - Distanzmessung mit ToF-Sensoren
+
+                  {{0-1}}
+*********************************************
 
 ![](https://docs.arduino.cc/static/ce29ac06a54005218e6763f0594d29da/4ef49/image.png "ToF-Sensoren am Alvik-Roboter Dokumentation des Projektes unter https://docs.arduino.cc/tutorials/alvik/user-manual/#deep-dive-programming-alvik")
 
@@ -136,12 +145,18 @@ Unsere Aufgabe integriert alle Komponenten eines klassischen **Regelkreises**:
 4. Distanz = (Lichtgeschwindigkeit × Zeit) / 2
 
 **Vorteile:**
+
 - ✅ Präzise Messung (±3%)
 - ✅ Funktioniert bei verschiedenen Materialien
 - ✅ Messbereich: 5-200 cm
 - ✅ Schnelle Messung (bis 50 Hz)
 
-```python
+*********************************************
+
+                  {{1-2}}
+*********************************************
+
+```python     Distanzsensor.py
 from arduino_alvik import ArduinoAlvik
 import time
 
@@ -177,6 +192,8 @@ print("Roboter gestoppt.")
 ```
 
 > **Aufgabe:** Erklären Sie den Code, was passiert in der Hauptschleife?
+
+*********************************************
 
 ## 2. Sollwert und Fehlerberechnung
 
@@ -407,18 +424,16 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 url = "https://raw.githubusercontent.com/LiaPlayground/Alvik_Controler/refs/heads/main/data/critical.csv"
-
 df = pd.read_csv(url, header = 0, sep=" ")  
+
 plt.plot(df["time"], df["distance"])
-plt.axhline(y=10, color='r', linestyle='--', label='Sollwert (10 cm)')
-plt.xlabel("Time (s)")
-plt.ylabel("Distance (cm)")
+plt.axhline(y=10, color='r', linestyle='--')
 
 plt.savefig('foo.png')
 ```
 @LIA.eval(`["main.py"]`, `none`, `python3 main.py`)
 
->  Bestimmen Sie die maximale Überschwingung im Diagramm.
+>  Was fehlt Ihnen am Diagramm?
 
 ### Optimierter Regler
 
@@ -428,18 +443,22 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 url = "https://raw.githubusercontent.com/LiaPlayground/Alvik_Controler/refs/heads/main/data/optimal.csv"
-
 df = pd.read_csv(url, header = 0, sep=" ")  
-plt.plot(df["time"], df["distance"])
-plot.axhline(y=10, color='r', linestyle='--', label='Sollwert (10 cm)')
-plt.xlabel("Time (s)")
-plt.ylabel("Distance (cm)")
+
+plt.plot(df["time"], df["distance"], label='Gemessene Distanz')
+plt.axhline(y=10, color='r', linestyle='--', label='Sollwert (10 cm)')
+plt.xlabel("Zeit (s)")
+plt.ylabel("Distanz (cm)")
+plt.legend()
 
 plt.savefig('foo.png')
 ```
 @LIA.eval(`["main.py"]`, `none`, `python3 main.py`)
 
 > Wie können wir die Geschwindigkeiten im Diagramm darstellen, um das Regelverhalten besser zu verstehen?
+
+{{2}}
+![](diagram.png)
 
 ## Zusammenfassung und Ausblick
 
@@ -507,3 +526,46 @@ Wir kennen die grundlegenden Konzepte der **Regelungstechnik**:
 [( )] Der Roboter fährt sehr schnell
 [( )] Die Motoren sind immer an
 [( )] Der Sensor zeigt immer denselben Wert
+
+## Erweiterte Visualisierung: Distanz und Geschwindigkeit
+
+Um das Regelverhalten besser zu verstehen, schauen wir uns sowohl die Distanz als auch die Stellgröße (Geschwindigkeit) an:
+
+```python    complexPlot.py
+import pandas as pd
+import matplotlib.pyplot as plt
+
+url = "https://raw.githubusercontent.com/LiaPlayground/Alvik_Controler/refs/heads/main/data/optimal.csv"
+
+df = pd.read_csv(url, header=0, sep=" ")
+
+# Zwei Subplots untereinander
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+
+# Oberes Diagramm: Distanz
+ax1.plot(df["time"], df["distance"], 'b-', linewidth=2, label='Gemessene Distanz')
+ax1.axhline(y=10, color='r', linestyle='--', linewidth=2, label='Sollwert (10 cm)')
+ax1.set_ylabel('Distanz [cm]', fontsize=12)
+ax1.set_title('Distanzverlauf bei optimierter Regelung', fontsize=14, fontweight='bold')
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Unteres Diagramm: Geschwindigkeit
+ax2.plot(df["time"], df["speed"], 'orange', linewidth=2, label='Motorgeschwindigkeit')
+ax2.axhline(y=0, color='k', linestyle='-', linewidth=0.5)
+ax2.fill_between(df["time"], df["speed"], alpha=0.3, color='orange')
+ax2.set_xlabel('Zeit [ms]', fontsize=12)
+ax2.set_ylabel('Geschwindigkeit', fontsize=12)
+ax2.set_title('Stellgröße (Motorgeschwindigkeit)', fontsize=14, fontweight='bold')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('foo.png')
+```
+@LIA.eval(`["main.py"]`, `none`, `python3 main.py`)
+
+> **Beobachtung:**
+> - Im oberen Diagramm sehen Sie, wie sich die Distanz dem Sollwert annähert
+> - Im unteren Diagramm erkennen Sie, wie die Motorgeschwindigkeit entsprechend angepasst wird
+> - Anfangs ist die Geschwindigkeit hoch (großer Fehler), dann nimmt sie ab, wenn der Sollwert erreicht wird
