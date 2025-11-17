@@ -1,7 +1,7 @@
 <!--
 author:   Ihr Name
 email:    ihre.email@beispiel.de
-version:  1.0.1
+version:  1.0.2
 language: de
 narrator: Deutsch Female
 
@@ -34,7 +34,7 @@ import: https://github.com/liascript/CodeRunner
 
 -->
 
-[![LiaScript](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/liaScript/ArduinoEinstieg/master/Parcel_monitor.md#1)
+[![LiaScript](https://raw.githubusercontent.com/LiaScript/LiaScript/master/badges/course.svg)](https://liascript.github.io/course/?https://raw.githubusercontent.com/LiaPlayground/Alvik_Controler/refs/heads/main/README.md)
 
 
 # Mikrocontrollerprogrammierung und Datenanalyse 
